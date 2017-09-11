@@ -1,0 +1,3 @@
+#
+*.local
+*sc/__pycache__
