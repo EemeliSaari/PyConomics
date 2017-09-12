@@ -44,10 +44,11 @@ def scrapper(symbol,startdate,enddate,loc='HEL',rows=200):
 
 def data_frame(symbol,startdate,enddate):
     """
+    Converts a scrapped list to a panda data set for further use.
 
-    :param symbol:
-    :param startdate:
-    :param enddate:
+    :param symbol: ticker of the stock company
+    :param startdate: start date of the data frame
+    :param enddate: end date for the data frame
     
     :return: .csv file of of the given stock symbol with 
                     header=date;open;high;low;close;volume
