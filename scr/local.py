@@ -1,3 +1,6 @@
+# Saves the mined data into a .pickle dumps, compiles and converts them
+# for further use.
+
 import os
 import pickle
 
@@ -5,12 +8,7 @@ import pandas as pd
 
 from web_scraper import get_omx
 from scrap_google import data_frame
-from utils import convert_date, conver_volume_format
-
-
-# Saves the mined data into a .pickle dumps, compiles and converts them
-# for further use.
-
+from utils import convert_date, convert_volume_format
 
 def get_symbols(location):
     """
@@ -118,16 +116,15 @@ def compile_data(market, column, target_path=False):
         new_df.to_csv(target_path + 'OMX_{:s}_joined_{:s}.csv'.format(market,column))
 
 
-def pickle_to_csv():
+def pickle_to_csv(pickles_path = './.local/df_stock_pickle/',
+                  new_path = './.local/df_stock_csv/'):
     """
     Converts the aquired pickle dumps to .csv files
-    """
 
-    # path for pickle dumps
-    pickles_path = './.local/df_stock_pickle/'
-    
+    :param pickles_path: path for pickle dumps
+    :param new_path: path to new csv
+    """
     # make the directory for the csv files
-    new_path = './.local/df_stock_csv/'
     if not os.path.exists(new_path):
         os.mkdir(new_path)
 
@@ -142,7 +139,7 @@ def pickle_to_csv():
 
                 # converts dates into unified format and sets them as index
                 df['date'] = df['date'].apply(convert_date)
-                df['volume'] = df['volume'].apply(conver_volume_format)
+                df['volume'] = df['volume'].apply(convert_volume_format)
                 df.set_index('date',inplace=True)
                 
                 csv = df.to_csv(new_path + "{:}.csv".format(file_name.strip('.pickle')))

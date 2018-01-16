@@ -98,5 +98,5 @@ def correlation_table(market, column):
     plt.show()
 
 #correlation_table('helsinki','close')
-simple_graph('ELISA','./.local/df_compiled/OMX_helsinki_joined_close.csv')
+#simple_graph('ELISA','./.local/df_compiled/OMX_helsinki_joined_close.csv')
 #decent_graph('PIZZA')

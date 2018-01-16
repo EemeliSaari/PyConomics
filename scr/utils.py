@@ -1,8 +1,6 @@
-from datetime import datetime as dt
-import pickle
-
 # Utility functions
 
+from datetime import datetime as dt
 
 def convert_date(date):
     """
@@ -12,7 +10,7 @@ def convert_date(date):
     return dt.strptime(date,'%b %d, %Y').strftime('%Y-%m-%d')
 
 
-def conver_volume_format(string):
+def convert_volume_format(string):
     """
     Converts volume
     """
