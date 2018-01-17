@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 
 
-def data_frame(symbol, startdate, enddate, market='HEL'):
+def get_price_df(symbol, startdate, enddate, market='HEL', time_out=0):
     """
     Converts a scrapped list from Google's Finance history 
     page to a panda data set for further use.
@@ -13,19 +13,19 @@ def data_frame(symbol, startdate, enddate, market='HEL'):
     :param enddate: end date for the data frame
     :param market: market that we're using available:HEL (default)
                                                      ---
+    :param time_out: if process needs to wait a brief amount of time between each request
     :return: a pandas DataFrame that is in a format: 
                 header= [date;open;high;low;close;volume]
     """
     i = 0
     rows = 200
     data = []
-    loop = True
-    while loop:
+    while True:
         try:
             url = 'https://www.google.com/finance/historical?q={:s}%3A{:s}&startdate={:s}&enddate={:s}&start={:d}&num={:d}'.format(market, symbol, startdate, enddate, i, rows)
             response = requests.get(url)
             soup = bs.BeautifulSoup(response.text,'lxml')
-
+            # Scrap the response 
             table = soup.find('table',{'class':'gf-table historical_price'})
             
             for head in table.findAll('tr')[1:]:
@@ -37,21 +37,34 @@ def data_frame(symbol, startdate, enddate, market='HEL'):
 
                 data.append(date + rest)
 
-            i += 200
+            i += rows
 
         except AttributeError:
-            loop = False
+            break
 
     header = ['date', 'open', 'high', 'low', 'close', 'volume']
 
     return pd.DataFrame(data=data, columns=header)
 
 
-def get_omx(location,target=1):
+def get_omx_markets():
+    """Scrapes the information about the omx nordic markets."""
+
+    url = 'http://www.nasdaqomxnordic.com/shares/listed-companies/nordic-large-cap'
+    response = requests.get(url)
+    soup = bs.BeautifulSoup(response.text, 'lxml')
+
+    table = soup.find('article', {'class':'nordic-article'})
+    raw = [x.find_all('a')[0].text.split(' ') for x in table.find_all('li') if x.find_all('a', href=True)]
+
+    return([x[1] for x in raw if 'Nasdaq' in x and len(x) == 2])
+
+
+def get_omx_data(market, *targets):
     """
     Scrapes a Nasdq Nordic website based on markets location and searched attribute.
 
-    :param location: Markets based on the Nasdaq nordic. Example: helsinki or iceland
+    :param market:
     :param target: attribute we're looking for: 0 = name
                                                 1 = symbol (default)
                                                 2 = currency
@@ -61,14 +74,20 @@ def get_omx(location,target=1):
                                                 6 = fact sheet (pdf file)
     :return:list of target attributes
     """
-    try:    
-        url = 'http://www.nasdaqomxnordic.com/shares/listed-companies/'
-        response = requests.get(url + location)
-        soup = bs.BeautifulSoup(response.text,'lxml')
+    try:
+        url = 'http://www.nasdaqomxnordic.com/shares/listed-companies/{:s}'.format(market)
+        response = requests.get(url)
+        soup = bs.BeautifulSoup(response.text, 'lxml')
 
         table = soup.find('table', {'class':'tablesorter'}) 
+        if targets:
+            data = []
+            for t in targets:
+                data.append([row.findAll('td')[t].text for row in table.findAll('tr')[1:]])
 
-        return [row.findAll('td')[target].text for row in table.findAll('tr')[1:]]
-    
+            return data
+        else:
+            return [row.findAll('td')[1].text for row in table.findAll('tr')[1:]]
+
     except AttributeError:
-        return False
+        raise AttributeError('Error in the scraping process.')
