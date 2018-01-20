@@ -1,18 +1,33 @@
 import bs4 as bs
 import pandas as pd
 import requests
+import pandas_datareader.data as web
+from time import sleep
+from datetime import datetime, date
+from src.queries import YahooQuery
+
+def get_price_yahoo(symbol, market, enddate, startdate='01.01.2018'):
+    """
+    """
+    yahoo = YahooQuery(symbol, market)
+    raw = yahoo.get_historic(startdate, enddate, '1d')
+    sleep(0.5)
+    
+    #print(raw)
 
 
-def get_price_df(symbol, startdate, enddate, market='HEL', time_out=0):
+def get_price_google(symbol, startdate, enddate, market='HEL', time_out=0):
     """
     Converts a scrapped list from Google's Finance history 
     page to a panda data set for further use.
+
+    *NOTE* THIS FUNCTION ONLY WORKS IN SPECIFIC NETWORK CONDITIONS
+    WHERE GOOGLE'S RECAPTCHA WON'T DETECT THE AUTOMATED QUERIES 
 
     :param symbol: ticker of the stock company
     :param startdate: start date of the data frame
     :param enddate: end date for the data frame
     :param market: market that we're using available:HEL (default)
-                                                     ---
     :param time_out: if process needs to wait a brief amount of time between each request
     :return: a pandas DataFrame that is in a format: 
                 header= [date;open;high;low;close;volume]
@@ -24,9 +39,9 @@ def get_price_df(symbol, startdate, enddate, market='HEL', time_out=0):
         try:
             url = 'https://www.google.com/finance/historical?q={:s}%3A{:s}&startdate={:s}&enddate={:s}&start={:d}&num={:d}'.format(market, symbol, startdate, enddate, i, rows)
             response = requests.get(url)
-            soup = bs.BeautifulSoup(response.text,'lxml')
+            soup = bs.BeautifulSoup(response.text, 'lxml')
             # Scrap the response 
-            table = soup.find('table',{'class':'gf-table historical_price'})
+            table = soup.find('table', {'class':'gf-table historical_price'})
             
             for head in table.findAll('tr')[1:]:
                 date = [head.find('td', {'class':'lm'}).text.strip()]
@@ -44,7 +59,7 @@ def get_price_df(symbol, startdate, enddate, market='HEL', time_out=0):
 
     header = ['date', 'open', 'high', 'low', 'close', 'volume']
 
-    return pd.DataFrame(data=data, columns=header)
+    return data, header
 
 
 def get_omx_markets():
