@@ -1,22 +1,16 @@
 from optparse import OptionParser
 
-from init import initialize
+from init import DataBase
 from src.routines import check_date_routine
 
 def main():
     """
     Main routine for software
     """
-    initialize()
-
-    try:
-        # Everytime the program is started, we check if the data is up to date
-        check_date_routine('.local/')
-    except OSError:
-        # In case data is missing - get it.
-        print("All data is missing.\n"
-              "Starting the collection process...\n")
-        get_data()
+    # Check the state of the database
+    db = DataBase()
+    # Everytime the program is started, we check if the data is up to date
+    #check_date_routine()
 
     parser = OptionParser()
     parser.add_option("-p", "--port", dest="port")
