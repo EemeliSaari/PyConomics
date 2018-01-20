@@ -5,9 +5,29 @@ import pickle
 
 import pandas as pd
 
-from src.web_scraper import get_omx_data, get_price_df
+from src.web_scraper import get_omx_data, get_price_google, get_omx_markets
 from src.utils import convert_date, convert_volume_format
 
+def initialize_symbols(path):
+    """
+    Get the symbols for markets.
+
+    :param path: path to local data
+    """
+    if not os.path.exists(path):
+        os.mkdir(path)
+
+    markets_data = get_omx_markets()
+    markets_to_pickle('OMX', markets_data, path)
+    symbols = []
+    for market in markets_data:
+        symbols_data = get_omx_data(market, 0, 1, 4, 5)
+
+        symbols.append(symbols_data)
+        symbols_to_pickle(symbols_data, market, path)
+
+    return markets_data, symbols
+    
 
 def symbols_to_pickle(symbols, market, path):
     """
@@ -35,6 +55,7 @@ def symbols_to_pickle(symbols, market, path):
         if symbols != symbols_old:
             with open(target, 'wb') as f:
                 pickle.dump(symbols, f)
+
 
 def markets_to_pickle(market, data, path):
     """
