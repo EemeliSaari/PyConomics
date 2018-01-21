@@ -1,7 +1,21 @@
-#
-#
+# Ignores for the Pyconomics project.
+
+# local files storage:
 *.local
+
+# python related:
 *__pycache__
+
+# visual studio code:
 *.vscode
+
+# virtualenv:
 *.env
+
+# sqlite3 files:
 *.db
+*.db-journal
+
+# JS stuff:
+*bower_components
+*package-lock.json
