@@ -3,17 +3,41 @@ import pandas as pd
 import requests
 import pandas_datareader.data as web
 from time import sleep
-from datetime import datetime, date
-from src.queries import YahooQuery
 
-def get_price_yahoo(symbol, market, enddate, startdate='01.01.2018'):
+from src.queries import YahooQuery
+from src.utils import convert_date, convert_volume, parse_null
+
+def get_price_yahoo(symbol, market, enddate, startdate=0, time_out=0.2):
     """
+    Executes queries for historical stock prices.
+
+    :param symbol:
+    :param market:
+    :param enddate:
+    :param startdate:
+    :param time_out:
+
+    :return: data stored in format: [(date, open, high, low, close, adj_close, volume)...]
     """
     yahoo = YahooQuery(symbol, market)
-    raw = yahoo.get_historic(startdate, enddate, '1d')
-    sleep(0.5)
-    
-    #print(raw)
+    # Try 10 queries because sometimes errors might occure on yahoos data generation side
+    for i in range(10):
+        raw = yahoo.get_historic(end=enddate, interval='1d')
+        sleep(time_out)
+        data = []
+        if raw:
+            for row in parse_null(raw.splitlines()[1:]):
+                line = row.split(',')
+                date = convert_date(line[0])
+                open_price = float(line[1])
+                high_price = float(line[2])
+                low_price = float(line[3])
+                close_price = float(line[4])
+                adj_close = float(line[5])
+                volume = convert_volume(line[6])
+                data.append((date, open_price, high_price, low_price, close_price, adj_close, volume))
+            break
+    return(data)
 
 
 def get_price_google(symbol, startdate, enddate, market='HEL', time_out=0):
@@ -21,8 +45,7 @@ def get_price_google(symbol, startdate, enddate, market='HEL', time_out=0):
     Converts a scrapped list from Google's Finance history 
     page to a panda data set for further use.
 
-    *NOTE* THIS FUNCTION ONLY WORKS IN SPECIFIC NETWORK CONDITIONS
-    WHERE GOOGLE'S RECAPTCHA WON'T DETECT THE AUTOMATED QUERIES 
+    *NOTE* THIS FUNCTION DOESN'T WORK ANYMORE - USE YAHOO QUERY
 
     :param symbol: ticker of the stock company
     :param startdate: start date of the data frame
