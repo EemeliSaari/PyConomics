@@ -1,0 +1,22 @@
+{
+  "name": "PyConomics",
+  "homepage": "https://github.com/EemeliSaari/PyConomics",
+  "authors": [
+    "EemeliSaari"
+  ],
+  "description": "",
+  "main": "pyconomist.py",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^4.0.0",
+    "jquery": "^3.3.1",
+    "d3": "^4.12.2"
+  }
+}
