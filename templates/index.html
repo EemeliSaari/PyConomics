@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pyconomist</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href={{ url_for('static', filename='./bower_components/bootstrap/dist/css/bootstrap.min.css') }} rel="stylesheet" media="screen">
+      <link href={{ url_for('static', filename='./css/main.css') }} rel="stylesheet" media="screen">
+  </head>
+  <body>
+    <div class="jumbotron jumbotron-fluid">
+      <div class="container">
+        <h1 class="display-4">Pyconomist</h1>
+        <p class="lead">Full stack data analysing with Python.</p>
+      </div>
+    </div>
+    <div class="container">
+      <div id="title"></div>
+      <div id="chart"></div>
+      <form>
+        <div class="form-group row">
+          <div class="col-xs-2">
+              <label for="stockInput">Search</label>
+              <input type="symbol" class="form-control" id="stockInput">
+              <small id="stockHelp" class="form-text text-muted">Enter the stock symbol</small>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="updateGraph()">Enter</button>
+      </form>
+    </div>
+    <script src={{ url_for('static', filename='./bower_components/jquery/dist/jquery.min.js') }}></script>
+    <script src={{ url_for('static', filename='./bower_components/bootstrap/dist/js/bootstrap.min.js') }}></script>
+    <script src={{ url_for('static', filename='./bower_components/d3/d3.min.js') }}></script>
+    <script src={{ url_for('static', filename='./js/app.js') }}></script>
+  </body>
+</html>
