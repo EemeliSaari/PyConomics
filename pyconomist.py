@@ -1,7 +1,9 @@
 from optparse import OptionParser
 
-from init import DataBase
+from database import DataBase
 from src.routines import check_date_routine
+
+from server import Server
 
 def main():
     """
@@ -15,7 +17,12 @@ def main():
     parser = OptionParser()
     parser.add_option("-p", "--port", dest="port")
     (options, args) = parser.parse_args()
+
     #TODO add more options
+
+    # Start the server
+    Server(database=db, template_folder='templates').run(port=3000, debug=True)
+
 
 if __name__ == '__main__':
     main()
