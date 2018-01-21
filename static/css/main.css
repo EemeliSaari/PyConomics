@@ -1,0 +1,9 @@
+body {
+    padding-bottom: 20px;
+    font: 16px Courier;
+    font-weight: bold;
+}
+.jumbotron {
+  background-color: rgb(206, 165, 127);
+  opacity: 0.5
+}
