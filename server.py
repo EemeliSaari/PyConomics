@@ -1,9 +1,11 @@
 import json
 import os
 import sys
+import sqlite3
 from functools import partial
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, abort
+
 
 ROUTES = dict()
 def route(route=None):
@@ -44,4 +46,7 @@ class Server(Flask):
     @route('/data/<string:symbol>')
     def get_stock(self, symbol):
         """Returns symbols price date in json format"""
-        return jsonify(self.__database.get_stock(symbol))
+        try:
+            return jsonify(self.__database.get_stock(symbol))
+        except sqlite3.OperationalError:
+            return abort(404)
