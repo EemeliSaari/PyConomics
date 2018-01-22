@@ -100,8 +100,7 @@ class DataBase:
             print("Error creating the database\n{}".format(e))
 
     def get_stock(self, symbol):
-        """
-        """
+        """Queries the database for a given stock symbol"""
         symbol = "stock_" + name_stock_symbol(symbol, sep='_')
 
         return self.__c.execute('SELECT * FROM {:s}'.format(symbol)).fetchall()
@@ -126,7 +125,6 @@ class DataBase:
             close FLOAT,
             adj_close FLOAT,
             volume BIGINT)'''.format(symbol))
-
         return symbol
 
     def insert_unprocessed(self, company_symbol, date):
@@ -139,7 +137,6 @@ class DataBase:
         self.__c.execute('''CREATE TABLE IF NOT EXISTS unprocessed_companies (
             symbol TEXT,
             date DATE)''')
-
         self.__c.execute('''INSERT INTO unprocessed_companies VALUES (?, ?)''', (company_symbol, date))
 
     def insert_stock(self, company_symbol, data):
@@ -154,6 +151,12 @@ class DataBase:
                                 .format(company_symbol), data)
 
     def insert_company(self, market, data):
+        """
+        Insert new company
+
+        :param market:
+        :param data:
+        """
         symbol = data[1]
         self.__c.execute('''INSERT INTO {:s} (name, symbol, sector, ICB, market_id) VALUES(?, ?, ?, ?, ?)'''
                             .format(market), data)
@@ -161,6 +164,12 @@ class DataBase:
         return self.__c.execute("SELECT company_id FROM {:s} WHERE symbol=?".format(market), (symbol,)).fetchone()[0]
 
     def insert_market(self, market, today):
+        """
+        Insert new market to omx_nordic
+
+        :param market:
+        :param today:
+        """
         # Insert the market name and day which insertion was made
         self.__c.execute('''INSERT INTO omx_nordic (name, updated) VALUES ('{:s}', '{:s}')'''
                             .format(market, today))
@@ -168,6 +177,7 @@ class DataBase:
         return self.__c.execute("SELECT id FROM omx_nordic WHERE name='{:s}'".format(market)).fetchone()[0]
 
 def dict_factory(cursor, row):
+    """Returns database rows in dict format instead of tuple"""
 
     data = {}
     for i, col in enumerate(cursor.description):
