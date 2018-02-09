@@ -1,7 +1,6 @@
 import bs4 as bs
 import pandas as pd
 import requests
-import pandas_datareader.data as web
 from time import sleep
 
 from src.queries import YahooQuery

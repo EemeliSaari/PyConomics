@@ -93,7 +93,7 @@ var Graph = function(){
                     x.domain(d3.extent(data, function(d) { return parseTime(d.date); }));
                     y.domain(d3.extent(data, function(d) { return +d.close; }));
 
-                    this.svg = d3.select("#chart").transition().ease("sin-in-out");
+                    this.svg = d3.select("#chart").transition();
 
                     this.svg.select(".line")
                         .duration(750)
