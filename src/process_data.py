@@ -1,57 +1,30 @@
-from collections import Counter
 import pickle
+from collections import Counter
+
 import numpy as np
 import pandas as pd
 
-
-def determination(*args):
-
-    cols = [x for x in args]
-    req = 0.02
-
-    for col in cols:
-        if col > req:
-            return 1
-        if col < -req:
-            return -1
-    return 0
+from database import DataBase
 
 
-def process_labels(symbol,location,dt):
+class DataSet:
 
-    days = 5
-    df = pd.read_csv('./.local/df_compiled/OMX_{:s}_joined_{:s}.csv'
-                    .format(location,dt), index_col = 0)
+    def __init__(self, symbol, db):
 
-    symbols = df.columns.values.tolist()
-    df.fillna(0,inplace=True)
+        self.__raw = [list(x.values())[0] for x in db.get_stock(symbol, column='close')]
 
-    for i in range(1, days+1):
+        print(self.__raw)
 
-        dr = df[symbol]
-        df['{}_{}d'.format(symbol,i)] = (dr.shift(-i) - dr) / dr
+def process_naive(symbol, db, num_steps, input_size):
 
-    df.fillna(0,inplace=True)
-    
-    df['{:s}_target'.format(symbol)] = df.apply(lambda x: determination(x['{:s}_1d'.format(symbol)],
-                                               x['{:s}_2d'.format(symbol)], 
-                                               x['{:s}_3d'.format(symbol)],
-                                               x['{:s}_4d'.format(symbol)],
-                                               x['{:s}_5d'.format(symbol)]),axis=1)
-    
-    str_vals = [str(i) for i in df['{:s}_target'.format(symbol)].values.tolist()]
-    print('Data spread:', Counter(str_vals))
+    X = []
+    y = []
+    DataSet(symbol, db)
+    data = db.get_stock(symbol)
 
-    df.fillna(0, inplace=True)
-    df = df.replace([np.inf, -np.inf], np.nan)
-    df.dropna(inplace=True)
-
-    df_vals = df[[s for s in symbols]].pct_change()
-    df_vals = df_vals.replace([np.inf, -np.inf], 0)
-    df_vals.fillna(0, inplace=True)
-
-    X, y = df_vals.values, df['{:s}_target'.format(symbol)].values
-
-    return X, y, df
-
-#process_labels('YLEPS','helsinki','close')
+    for n, row in enumerate(data[1:len(data)-1]):
+        X.append(row['close'])
+        y.append(data[n+1]['close'])
+    seq = [np.array(X[i * input_size: (i + 1) * input_size]) for i in range(len(X) // input_size)]
+    #print(seq)
+    return np.array(X), np.array(y)
