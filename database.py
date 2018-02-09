@@ -99,11 +99,11 @@ class DataBase:
             os.remove(self.__db)
             print("Error creating the database\n{}".format(e))
 
-    def get_stock(self, symbol):
+    def get_stock(self, symbol, column='*'):
         """Queries the database for a given stock symbol"""
         symbol = "stock_" + name_stock_symbol(symbol, sep='_')
 
-        return self.__c.execute('SELECT * FROM {:s}'.format(symbol)).fetchall()
+        return self.__c.execute('SELECT {:s} FROM {:s}'.format(column, symbol)).fetchall()
 
     def new_stock_table(self, company_symbol, market):
         """
