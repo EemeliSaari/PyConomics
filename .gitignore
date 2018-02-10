@@ -19,3 +19,4 @@
 # JS stuff:
 *bower_components
 *package-lock.json
+*node_modules
