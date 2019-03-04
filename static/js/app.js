@@ -5,7 +5,11 @@ $(function() {
     graph.create('ELISA')
 
     document.getElementById('searchButton').addEventListener("click", function() { graph.newGraph();}, false);
-    //TODO add sumbit event handler
+    //document.getElementById('max_scale').addEventListener("toggle", function() {graph.scaleGraph();}, false);
+    //document.getElementById('1y_scale').addEventListener("toggle", function() {graph.scaleGraph();}, false);
+    //document.getElementById('1m_scale').addEventListener("toggle", function() {graph.scaleGraph();}, false);
+    //document.getElementById('1wk_scale').addEventListener("toggle", function() {graph.scaleGraph();}, false);
+    $(document).ready()
 });
 
 var Graph = function(){
@@ -28,10 +32,10 @@ var Graph = function(){
     var x = d3.scaleTime()
         .rangeRound([0, width]);
 
-
-
     var y = d3.scaleLinear()
         .rangeRound([height, 0]);
+
+    var data;
 
     var line = d3.line()
         .x(function(d) {return x(parseTime(d.date)); })
@@ -43,12 +47,14 @@ var Graph = function(){
                 .text(symbol)
 
             var url = "/data/" + symbol
-            d3.json(url, function(error, data){
+            d3.json(url, function(error, json){
 
                 if (error) throw error;
-                console.log(data)
-                x.domain(d3.extent(data, function(d) { return parseTime(d.date); }));
-                y.domain(d3.extent(data, function(d) { return +d.close; }));
+
+                data = json;
+
+                x.domain(d3.extent(json, function(d) { return parseTime(d.date); }));
+                y.domain(d3.extent(json, function(d) { return +d.close; }));
 
                 g.append("g")
                     .attr("transform", "translate(0," + height + ")")
@@ -67,37 +73,38 @@ var Graph = function(){
                     .attr("stroke-linejoin", "round")
                     .attr("stroke-linecap", "round")
                     .attr("stroke-width", 1)
-                    .attr("d", line(data))
+                    .attr("d", line(json))
                     .text("Date");
             });
         },
 
         scaleGraph : function(){
             //TODO
+            console.log("hello")
         },
 
         newGraph : function(){
             symbol = document.getElementById('stockInput').value;
-            console.log('hey')
             if (symbol){
                 // Update title
                 var title = d3.select("#title").select("h2")
                     .text(symbol);
                 url = "/data/" + symbol
-                d3.json(url, function(error, data){
+                d3.json(url, function(error, json){
                     if (error) throw error
                     
+                    data = json;
+
                     //TODO handle 404 invalid search
 
-                    console.log(data)
-                    x.domain(d3.extent(data, function(d) { return parseTime(d.date); }));
-                    y.domain(d3.extent(data, function(d) { return +d.close; }));
+                    x.domain(d3.extent(json, function(d) { return parseTime(d.date); }));
+                    y.domain(d3.extent(json, function(d) { return +d.close; }));
 
                     this.svg = d3.select("#chart").transition();
 
                     this.svg.select(".line")
                         .duration(750)
-                        .attr("d", line(data));
+                        .attr("d", line(json));
 
                     this.svg.select(".xAxis")
                         .duration(750)
